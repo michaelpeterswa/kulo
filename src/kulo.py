@@ -2,7 +2,9 @@
 # kulo.py
 
 import geojson
+import numpy as np
 from shapely.geometry import shape, MultiPolygon, Polygon, Point
+
 
 input_file = "..\data\Washington_Large_Fires_1973-2019.geojson"
 
@@ -15,11 +17,16 @@ def loadData(filename):
         data = geojson.load(f)
     return data
 
-def returnAcreage(fire):
+def returnMaxAcreage(fire_data):
     """
-    return acreage of a fire
+    return maximum acreage
     """
-    return fire["properties"]["ACRES"]
+    fire_max = 0
+    for fire in fire_data:
+        if fire["properties"]["ACRES"] >= fire_max:
+            fire_max = fire["properties"]["ACRES"]
+
+    return fire_max
 
 def createPolygon(fire):
     """
@@ -43,22 +50,33 @@ def generateCentroid(polygon):
     """
     calculate and return centroid of a polygon
     """
-    return polygon.centroid.coords
+    return list(polygon.centroid.coords)
 
 def isMultiPolygonal(fire):
     """
     return true if the object is a MultiPolygon
     """
     return True if fire["geometry"]["type"] == "MultiPolygon" else False
-    
 
+def normalizeFireData(fire_data, max_acres, lat_div, long_div):
+    fire_data_list = []
+    for fire in fire_data:
+        fire_size = fire[1]["ACRES"] / max_acreage
+        fire_lat = fire[0][0][1] / lat_div
+        fire_long = fire[0][0][0] / long_div
+        fire_data_list.append([fire_lat, fire_long, fire_size])
+    fire_data_nparray = np.array(fire_data_list)
+    return fire_data_nparray
+    
 
 if __name__ == "__main__":
     fire_data = loadData(input_file)
     fire_data = fire_data["features"]
+    max_acreage = returnMaxAcreage(fire_data)
     results = []
     for fire in fire_data:
         poly = createPolygonFromMulti(fire) if isMultiPolygonal(fire) else createPolygon(fire)
         fire_centroid = generateCentroid(poly)
-        results.append((list(fire_centroid), fire["properties"]))
-    print(results)
+        results.append((fire_centroid, fire["properties"]))
+    normalized_fire_data = normalizeFireData(results, max_acreage, 100, 200)
+    print(normalized_fire_data)
