@@ -58,7 +58,7 @@ def isMultiPolygonal(fire):
     """
     return True if fire["geometry"]["type"] == "MultiPolygon" else False
 
-def normalizeFireData(fire_data, max_acres, lat_div, long_div):
+def normalizeFireData(fire_data, max_acres, lat_div=100, long_div=200):
     fire_data_list = []
     for fire in fire_data:
         fire_size = fire[1]["ACRES"] / max_acreage
@@ -78,5 +78,5 @@ if __name__ == "__main__":
         poly = createPolygonFromMulti(fire) if isMultiPolygonal(fire) else createPolygon(fire)
         fire_centroid = generateCentroid(poly)
         results.append((fire_centroid, fire["properties"]))
-    normalized_fire_data = normalizeFireData(results, max_acreage, 100, 200)
+    normalized_fire_data = normalizeFireData(results, max_acreage)
     print(normalized_fire_data)
