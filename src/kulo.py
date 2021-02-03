@@ -2,9 +2,12 @@
 # kulo.py
 
 import geojson
+import datetime
 import numpy as np
 from shapely.geometry import shape, MultiPolygon, Polygon, Point
-
+from keras.models import Sequential 
+from keras.layers import Dense
+from keras.callbacks import TensorBoard
 
 input_file = "..\data\Washington_Large_Fires_1973-2019.geojson"
 
@@ -73,10 +76,40 @@ if __name__ == "__main__":
     fire_data = loadData(input_file)
     fire_data = fire_data["features"]
     max_acreage = returnMaxAcreage(fire_data)
+    lat_amt = 100
+    long_amt = 200
     results = []
     for fire in fire_data:
         poly = createPolygonFromMulti(fire) if isMultiPolygonal(fire) else createPolygon(fire)
         fire_centroid = generateCentroid(poly)
         results.append((fire_centroid, fire["properties"]))
-    normalized_fire_data = normalizeFireData(results, max_acreage)
-    print(normalized_fire_data)
+    normalized_fire_data = normalizeFireData(results, max_acreage, lat_amt, long_amt)
+
+    #-----------------------------
+    X = normalized_fire_data[:,0:2]
+    y = normalized_fire_data[:,2]
+    model = Sequential()
+    model.add(Dense(4, input_dim=2, activation='relu'))
+    model.add(Dense(4, activation='relu'))
+    model.add(Dense(1, activation='linear'))
+    model.compile(loss='mse', optimizer='adam')
+
+    log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    tensorboard_callback = TensorBoard(log_dir=log_dir, histogram_freq=1)
+
+    model.fit(X, y, batch_size=5, epochs=1000, callbacks=[tensorboard_callback], verbose=0)
+    results = model.evaluate(X, y)
+
+    model.save("kulo_model")
+
+    print("Loss: ", results)
+
+    test_lat = 48.383549
+    test_long = -120.009935
+
+    samples = [(test_lat / lat_amt, test_long / long_amt)]
+    npsamples = np.array(samples)
+    predictions = model.predict(samples)
+    result_acres = predictions[0][0] * max_acreage
+
+    print("final result for: (", test_lat, ",", test_long, ") at ", result_acres, "acres" )
