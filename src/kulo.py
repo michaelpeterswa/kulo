@@ -76,6 +76,7 @@ if __name__ == "__main__":
     fire_data = loadData(input_file)
     fire_data = fire_data["features"]
     max_acreage = returnMaxAcreage(fire_data)
+    print(max_acreage)
     lat_amt = 100
     long_amt = 200
     results = []
@@ -85,7 +86,7 @@ if __name__ == "__main__":
         results.append((fire_centroid, fire["properties"]))
     normalized_fire_data = normalizeFireData(results, max_acreage, lat_amt, long_amt)
 
-    #-----------------------------
+    # #-----------------------------
     X = normalized_fire_data[:,0:2]
     y = normalized_fire_data[:,2]
     model = Sequential()
@@ -97,19 +98,18 @@ if __name__ == "__main__":
     log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     tensorboard_callback = TensorBoard(log_dir=log_dir, histogram_freq=1)
 
-    model.fit(X, y, batch_size=5, epochs=1000, callbacks=[tensorboard_callback], verbose=0)
+    model.fit(X, y, batch_size=3, epochs=1000, callbacks=[tensorboard_callback], verbose=1)
     results = model.evaluate(X, y)
 
-    model.save("kulo_model")
-
+    model.save("../kulo_model")
     print("Loss: ", results)
 
-    test_lat = 48.383549
-    test_long = -120.009935
+    # test_lat = 48.383549
+    # test_long = -120.009935
 
-    samples = [(test_lat / lat_amt, test_long / long_amt)]
-    npsamples = np.array(samples)
-    predictions = model.predict(samples)
-    result_acres = predictions[0][0] * max_acreage
+    # samples = [(test_lat / lat_amt, test_long / long_amt)]
+    # npsamples = np.array(samples)
+    # predictions = model.predict(samples)
+    # result_acres = predictions[0][0] * max_acreage
 
-    print("final result for: (", test_lat, ",", test_long, ") at ", result_acres, "acres" )
+    # print("final result for: (", test_lat, ",", test_long, ") at ", result_acres, "acres" )
