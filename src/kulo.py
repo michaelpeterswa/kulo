@@ -90,18 +90,17 @@ if __name__ == "__main__":
     y = normalized_fire_data[:,2]
     model = Sequential()
     model.add(Dense(4, input_dim=2, activation='relu'))
-    model.add(Dense(4, activation='relu'))
+    model.add(Dense(8, activation='relu'))
     model.add(Dense(1, activation='linear'))
     model.compile(loss='mse', optimizer='adam')
 
     log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     tensorboard_callback = TensorBoard(log_dir=log_dir, histogram_freq=1)
 
-    model.fit(X, y, batch_size=5, epochs=1000, callbacks=[tensorboard_callback], verbose=0)
+    model.fit(X, y, batch_size=5, epochs=400, callbacks=[tensorboard_callback], verbose=1)
     results = model.evaluate(X, y)
 
-    model.save("kulo_model")
-
+    model.save("../kulo_model")
     print("Loss: ", results)
 
     test_lat = 48.383549
