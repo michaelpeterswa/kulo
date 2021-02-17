@@ -3,3 +3,5 @@ shapely
 numpy
 keras
 tensorflow
+python-dateutil
+matplotlib
