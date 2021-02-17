@@ -1,3 +1,4 @@
 {
-    "python.pythonPath": "C:\\Users\\Michael Peters\\AppData\\Local\\Microsoft\\WindowsApps\\python3.9.exe"
+    "python.pythonPath": "C:\\Users\\Michael Peters\\AppData\\Local\\Microsoft\\WindowsApps\\python.exe",
+    "jupyter.jupyterServerType": "local"
 }

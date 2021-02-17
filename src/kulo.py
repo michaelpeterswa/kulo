@@ -1,6 +1,7 @@
 # michaelpeterswa
 # kulo.py
 
+import csv
 import geojson
 import datetime
 import numpy as np
@@ -78,7 +79,7 @@ if __name__ == "__main__":
     max_acreage = returnMaxAcreage(fire_data)
     print(max_acreage)
     lat_amt = 100
-    long_amt = 200
+    long_amt = 100
     results = []
     for fire in fire_data:
         poly = createPolygonFromMulti(fire) if isMultiPolygonal(fire) else createPolygon(fire)
@@ -86,23 +87,27 @@ if __name__ == "__main__":
         results.append((fire_centroid, fire["properties"]))
     normalized_fire_data = normalizeFireData(results, max_acreage, lat_amt, long_amt)
 
+    with open("../data/cleaned_data.csv", 'w', newline='') as f:
+        csv_obj = csv.writer(f)
+        csv_obj.writerows(normalized_fire_data)
+
     # #-----------------------------
-    X = normalized_fire_data[:,0:2]
-    y = normalized_fire_data[:,2]
-    model = Sequential()
-    model.add(Dense(4, input_dim=2, activation='relu'))
-    model.add(Dense(4, activation='relu'))
-    model.add(Dense(1, activation='linear'))
-    model.compile(loss='mse', optimizer='adam')
+    # X = normalized_fire_data[:,0:2]
+    # y = normalized_fire_data[:,2]
+    # model = Sequential()
+    # model.add(Dense(4, input_dim=2, activation='relu'))
+    # model.add(Dense(4, activation='relu'))
+    # model.add(Dense(1, activation='linear'))
+    # model.compile(loss='mse', optimizer='adam')
 
-    log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-    tensorboard_callback = TensorBoard(log_dir=log_dir, histogram_freq=1)
+    # log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    # tensorboard_callback = TensorBoard(log_dir=log_dir, histogram_freq=1)
 
-    model.fit(X, y, batch_size=3, epochs=1000, callbacks=[tensorboard_callback], verbose=1)
-    results = model.evaluate(X, y)
+    # model.fit(X, y, batch_size=3, epochs=1000, callbacks=[tensorboard_callback], verbose=1)
+    # results = model.evaluate(X, y)
 
-    model.save("../kulo_model")
-    print("Loss: ", results)
+    # model.save("../kulo_model")
+    # print("Loss: ", results)
 
     # test_lat = 48.383549
     # test_long = -120.009935
