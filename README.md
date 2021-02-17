@@ -42,4 +42,4 @@ Michael Peters - michael@michaelpeterswa.com
 
 ## License
 
-MIT, See [LICENSE.md](LICENSE.md)
+MIT, See [LICENSE](LICENSE)
