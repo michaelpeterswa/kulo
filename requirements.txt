@@ -5,3 +5,4 @@ keras
 tensorflow
 python-dateutil
 matplotlib
+scikit-learn
